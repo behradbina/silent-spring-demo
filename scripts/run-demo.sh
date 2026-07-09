@@ -80,7 +80,6 @@ run_exploit() {
 
   kill "$SRV" 2>/dev/null; wait "$SRV" 2>/dev/null
 
-  # Verdict: did 'id' actually run? (uid= appears only if shell executed it)
   if grep -q "uid=" "$OUT"; then echo "VULNERABLE"; else echo "MITIGATED"; fi
 }
 
@@ -91,7 +90,6 @@ if [ -x "$N16" ]; then echo "Paper  Node : $("$N16" --version)  (local vendor co
   echo "Paper  Node : NOT FOUND (run scripts/setup.sh) — will demo system Node only"; fi
 hr
 
-# ---- Part A: minimal standalone gadget probe on both runtimes -------------
 say "[A] Universal gadget probe (standalone, no HTTP)"
 if [ -x "$N16" ]; then
   "$N16" scripts/probe-gadget.js | tee "$RESULTS/probe-node16.txt" | tail -6
@@ -99,7 +97,6 @@ fi
 say "    --- system node ---"
 "$SYS_NODE" scripts/probe-gadget.js | tee "$RESULTS/probe-system.txt" | tail -6
 
-# ---- Part B: full HTTP exploit on Node 16 (paper's version) ---------------
 V16="n/a"
 if [ -x "$N16" ]; then
   say "[B] Full HTTP exploit against live server — Node 16.13.1 (paper's version)"
@@ -107,7 +104,6 @@ if [ -x "$N16" ]; then
   V16="$(run_exploit "$N16" "$PORT16" "Node 16.13.1" "$RESULTS/server-node16.log" "$RESULTS/exploit-node16.txt" | tail -1)"
 fi
 
-# ---- Part C: same exploit on system Node ----------------------------------
 say "[C] Same HTTP exploit against live server — system Node ($("$SYS_NODE" --version))"
 hr
 VSYS="$(run_exploit "$SYS_NODE" "$PORTSYS" "system Node" "$RESULTS/server-system.log" "$RESULTS/exploit-system.txt" | tail -1)"
