@@ -113,11 +113,8 @@ closes this particular universal gadget — though application-level gadgets (th
 paper's Listing 2 pattern, `options.cmd || default`) remain the developer's
 responsibility on every Node version.
 
----
+## Interactive Web Dashboard
 
-## Safety / ethics
+The demo includes a visual web interface (`src/public/index.html`) that makes the attack tangible through a two-panel dashboard. The **Network Diagnostics** card lets you ping any host — this is the universal gadget (`child_process.spawn`) that becomes dangerous when the prototype is polluted. The **Dashboard Settings** card uses `lodash.defaultsDeep` to merge configuration objects — this is the injection sink that writes attacker-controlled properties to `Object.prototype`. Together, they demonstrate the paper's core insight: an apparently safe settings endpoint can silently poison the prototype, transforming a benign ping utility into a remote code execution vector, all through normal-looking UI interactions.
 
-This app is **intentionally insecure** and binds only to `127.0.0.1`. The "RCE"
-payloads used here are benign (`id`, and creating an empty `results/RCE_PROOF.txt`
-marker) purely to *prove* code execution. Do not deploy this server or point the
-technique at systems you do not own. For educational use in the course only.
+To see the attack in action, start the vulnerable server and open `http://127.0.0.1:3000`. First, ping `127.0.0.1; id` — you'll see normal ping output because the command runs as an argument array. Then click "Save Configuration" in the settings card (this sends the pollution payload `{"constructor":{"prototype":{"shell":true}}}` to the server). Now ping `127.0.0.1; id` again — this time the output includes the `id` command's result, confirming RCE. The dashboard's live feedback (`pre` output elements) shows each stage clearly, making it ideal for classroom demonstrations or self-guided exploration of the attack chain.
