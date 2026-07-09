@@ -51,6 +51,7 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-app.listen(PORT, '127.10.0.1', () => {
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`[server] SysMon dashboard on http://127.0.0.1:${PORT}  (Node ${process.version})`);
 });
