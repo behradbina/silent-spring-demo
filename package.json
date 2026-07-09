@@ -1,0 +1,17 @@
+{
+  "name": "silent-spring-demo",
+  "version": "1.0.0",
+  "description": "Educational reproduction of 'Silent Spring: Prototype Pollution Leads to RCE in Node.js' (USENIX Security 2023). Docker-free.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "demo": "bash scripts/run-demo.sh",
+    "probe": "node scripts/probe-gadget.js"
+  },
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1",
+    "lodash": "4.17.11"
+  }
+}

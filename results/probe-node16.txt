@@ -1,0 +1,18 @@
+============================================================
+Silent Spring — universal gadget probe
+Node runtime : v16.13.1
+============================================================
+
+[1] Baseline (no pollution)
+    echo argv output : "SAFE; echo INJECTED"
+    shell fired (RCE)?: false
+
+[2] Polluted Object.prototype.shell = true
+    {}.shell now      : true
+    echo argv output : "SAFE\nINJECTED"
+    shell fired (RCE)?: true
+
+------------------------------------------------------------
+VERDICT for Node v16.13.1: VULNERABLE
+------------------------------------------------------------
+RESULT_JSON {"node":"v16.13.1","baselineFired":false,"pollutedFired":true,"verdict":"VULNERABLE"}

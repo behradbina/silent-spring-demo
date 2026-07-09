@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SysMon Enterprise Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --line: #334155;
+      --text: #f8fafc; --sub: #94a3b8; --accent: #3b82f6;
+      --ok: #10b981; --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg);
+      color: var(--text); margin: 0; padding: 24px; display: flex; justify-content: center;
+    }
+    .container { max-width: 1000px; width: 100%; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 28px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
+    }
+    h1 { margin: 0; font-weight: 300; letter-spacing: 1px; }
+    .badge { background: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: .8rem; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.3); }
+    .card h2 { margin-top: 0; color: var(--sub); font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; }
+    .status { font-size: 1.9rem; font-weight: 700; color: var(--ok); margin: 8px 0 14px; }
+    input[type=text] {
+      width: 100%; background: var(--bg); border: 1px solid var(--line); color: #fff;
+      padding: 10px; border-radius: 6px; margin-bottom: 10px;
+    }
+    button { background: var(--accent); color: #fff; border: 0; padding: 10px 18px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; }
+    button:hover { background: #2563eb; }
+    label { display: block; margin-bottom: 5px; color: var(--sub); }
+    pre { background: #000; padding: 12px; border-radius: 6px; overflow-x: auto; color: #4ade80; font-size: .8rem; min-height: 110px; white-space: pre-wrap; word-break: break-all; }
+    .note { font-size: .75rem; color: var(--sub); margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SysMon <span style="color:var(--sub)">Enterprise</span></h1>
+      <span class="badge">v2.4.0 (Stable)</span>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Network Diagnostics</h2>
+        <div class="status">● Online</div>
+        <input type="text" id="hostInput" placeholder="Host or IP (e.g. 127.0.0.1)" value="127.0.0.1" />
+        <button onclick="runPing()">Run Diagnostics</button>
+        <pre id="pingOutput">Ready…</pre>
+      </div>
+
+      <div class="card">
+        <h2>Dashboard Settings</h2>
+        <label>Dashboard Title</label>
+        <input type="text" id="titleInput" value="System Monitor" />
+        <button onclick="saveSettings()">Save Configuration</button>
+        <pre id="settingsOutput">Config not yet loaded.</pre>
+        <div class="note">Settings are deep-merged server-side (lodash defaultsDeep).</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function runPing() {
+      const host = document.getElementById('hostInput').value || '127.0.0.1';
+      const out = document.getElementById('pingOutput');
+      out.textContent = 'Running diagnostics…';
+      try {
+        const res = await fetch('/api/ping?host=' + encodeURIComponent(host));
+        const data = await res.json();
+        out.textContent = (data.shellPolluted ? '[!] shell prototype is polluted\n\n' : '') +
+          (data.output || JSON.stringify(data, null, 2));
+      } catch (e) { out.textContent = 'Request failed: ' + e; }
+    }
+    async function saveSettings() {
+      const title = document.getElementById('titleInput').value;
+      const out = document.getElementById('settingsOutput');
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title }),
+        });
+        const data = await res.json();
+        out.textContent = JSON.stringify(data.config, null, 2);
+      } catch (e) { out.textContent = 'Failed to save: ' + e; }
+    }
+    saveSettings();
+  </script>
+</body>
+</html>
