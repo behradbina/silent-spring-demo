@@ -26,6 +26,7 @@ case "$ARCH" in
   *) echo "unsupported arch $ARCH"; exit 1 ;;
 esac
 
+# control version
 VER="v16.13.1"
 DIR="node-${VER}-${PLAT}-${NARCH}"
 TARBALL="${DIR}.tar.gz"
