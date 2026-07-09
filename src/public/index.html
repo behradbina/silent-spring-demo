@@ -3,467 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SysMon · Enterprise Dashboard</title>
+  <title>SysMon Enterprise Dashboard</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --bg: #0f172a; --card: #1e293b; --line: #334155;
+      --text: #f8fafc; --sub: #94a3b8; --accent: #3b82f6;
+      --ok: #10b981; --danger: #ef4444;
     }
-
+    * { box-sizing: border-box; }
     body {
-      background: #0b1120;
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 2rem 1.5rem;
-      color: #f1f5f9;
-      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg);
+      color: var(--text); margin: 0; padding: 24px; display: flex; justify-content: center;
     }
-
-    .container {
-      max-width: 1200px;
-      width: 100%;
+    .container { max-width: 1000px; width: 100%; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 28px; border-bottom: 1px solid var(--line); padding-bottom: 18px;
     }
-
-    /* header */
-    .dashboard-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid #1e293b;
+    h1 { margin: 0; font-weight: 300; letter-spacing: 1px; }
+    .badge { background: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: .8rem; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.3); }
+    .card h2 { margin-top: 0; color: var(--sub); font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; }
+    .status { font-size: 1.9rem; font-weight: 700; color: var(--ok); margin: 8px 0 14px; }
+    input[type=text] {
+      width: 100%; background: var(--bg); border: 1px solid var(--line); color: #fff;
+      padding: 10px; border-radius: 6px; margin-bottom: 10px;
     }
-
-    .brand {
-      display: flex;
-      align-items: baseline;
-      gap: 0.5rem;
-    }
-
-    .brand h1 {
-      font-weight: 400;
-      font-size: 1.9rem;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .brand .version {
-      font-size: 0.75rem;
-      background: #1e293b;
-      color: #94a3b8;
-      padding: 0.2rem 0.8rem;
-      border-radius: 20px;
-      font-weight: 500;
-      letter-spacing: 0.3px;
-      border: 1px solid #334155;
-    }
-
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: #1a2538;
-      padding: 0.45rem 1.2rem;
-      border-radius: 30px;
-      border: 1px solid #2d3a52;
-    }
-
-    .pulse {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background: #10b981;
-      border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
-      animation: pulse-green 2s infinite;
-    }
-
-    @keyframes pulse-green {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
-      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
-
-    .status-label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #cbd5e1;
-    }
-
-    /* grid */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 1.75rem;
-    }
-
-    .card {
-      background: #14202e;
-      border-radius: 20px;
-      padding: 1.75rem 1.8rem 2rem;
-      border: 1px solid #1f2a3f;
-      box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
-      transition: border-color 0.2s;
-    }
-
-    .card:hover {
-      border-color: #2d405c;
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.3rem;
-    }
-
-    .card-header h2 {
-      font-weight: 500;
-      font-size: 0.9rem;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      color: #94a3b8;
-    }
-
-    .card-header .icon {
-      font-size: 1.4rem;
-      opacity: 0.7;
-    }
-
-    /* ping card */
-    .ping-status {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .ping-status .big-dot {
-      width: 14px;
-      height: 14px;
-      background: #10b981;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .ping-status .status-text {
-      font-weight: 600;
-      font-size: 1.2rem;
-      color: #e2e8f0;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .input-group input {
-      flex: 1;
-      background: #0b1422;
-      border: 1px solid #26344b;
-      color: #f1f5f9;
-      padding: 0.7rem 1rem;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      transition: 0.2s;
-    }
-
-    .input-group input:focus {
-      outline: 2px solid #3b82f6;
-      outline-offset: 1px;
-      border-color: transparent;
-    }
-
-    .input-group input::placeholder {
-      color: #475569;
-    }
-
-    .btn {
-      background: #2563eb;
-      border: none;
-      color: white;
-      font-weight: 600;
-      padding: 0.7rem 1.5rem;
-      border-radius: 40px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: 0.15s;
-      white-space: nowrap;
-      border: 1px solid #3b82f6;
-    }
-
-    .btn:hover {
-      background: #1d4ed8;
-      border-color: #60a5fa;
-      transform: scale(0.97);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #334155;
-      color: #e2e8f0;
-    }
-
-    .btn-outline:hover {
-      background: #1e293b;
-      border-color: #4b5a78;
-    }
-
-    pre {
-      background: #0a111d;
-      padding: 1rem;
-      border-radius: 14px;
-      font-family: 'Fira Code', 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      color: #86efac;
-      border: 1px solid #1f2a3f;
-      min-height: 100px;
-      max-height: 220px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin-top: 0.5rem;
-    }
-
-    .card .note {
-      font-size: 0.75rem;
-      color: #64748b;
-      margin-top: 0.9rem;
-      padding-top: 0.4rem;
-      border-top: 1px dashed #1f2a3f;
-    }
-
-    label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: #94a3b8;
-      margin-bottom: 0.3rem;
-      letter-spacing: 0.2px;
-    }
-
-    .settings-field {
-      margin-bottom: 1.2rem;
-    }
-
-    .settings-field input {
-      width: 100%;
-      background: #0b1422;
-      border: 1px solid #26344b;
-      color: #f1f5f9;
-      padding: 0.7rem 1rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-    }
-
-    .settings-field input:focus {
-      outline: 2px solid #3b82f6;
-      outline-offset: 1px;
-      border-color: transparent;
-    }
-
-    .flex-btns {
-      display: flex;
-      gap: 0.6rem;
-      margin: 1.2rem 0 0.2rem;
-    }
-
-    .flex-btns .btn {
-      flex: 1;
-      text-align: center;
-    }
-
-    .badge-version {
-      background: #1e293b;
-      color: #94a3b8;
-      font-size: 0.7rem;
-      padding: 0.15rem 0.8rem;
-      border-radius: 40px;
-      border: 1px solid #2d3a52;
-    }
-
-    /* extra small */
-    @media (max-width: 500px) {
-      .dashboard-header {
-        flex-direction: column;
-        align-items: start;
-        gap: 0.8rem;
-      }
-      .brand h1 {
-        font-size: 1.6rem;
-      }
-    }
-
-    /* scroll */
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0b1422;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2d405c;
-      border-radius: 10px;
-    }
+    button { background: var(--accent); color: #fff; border: 0; padding: 10px 18px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; }
+    button:hover { background: #2563eb; }
+    label { display: block; margin-bottom: 5px; color: var(--sub); }
+    pre { background: #000; padding: 12px; border-radius: 6px; overflow-x: auto; color: #4ade80; font-size: .8rem; min-height: 110px; white-space: pre-wrap; word-break: break-all; }
+    .note { font-size: .75rem; color: var(--sub); margin-top: 10px; }
   </style>
 </head>
 <body>
-<div class="container">
-  <!-- header -->
-  <header class="dashboard-header">
-    <div class="brand">
-      <h1>SysMon</h1>
-      <span class="version">v2.4.0 · enterprise</span>
-    </div>
-    <div class="status-indicator">
-      <span class="pulse"></span>
-      <span class="status-label">All systems nominal</span>
-      <span style="margin-left: 0.3rem; color: #475569;">|</span>
-      <span style="color: #94a3b8; font-size:0.8rem;">🔒</span>
-    </div>
-  </header>
+  <div class="container">
+    <header>
+      <h1>SysMon <span style="color:var(--sub)">Enterprise</span></h1>
+      <span class="badge">v2.4.0 (Stable)</span>
+    </header>
 
-  <!-- main grid -->
-  <div class="grid-2">
-    <!-- CARD: network diagnostics -->
-    <div class="card">
-      <div class="card-header">
-        <h2>🌐 Network diagnostics</h2>
-        <span class="icon">📡</span>
+    <div class="grid">
+      <div class="card">
+        <h2>Network Diagnostics</h2>
+        <div class="status">● Online</div>
+        <input type="text" id="hostInput" placeholder="Host or IP (e.g. 127.0.0.1)" value="127.0.0.1" />
+        <button onclick="runPing()">Run Diagnostics</button>
+        <pre id="pingOutput">Ready…</pre>
       </div>
-      <div class="ping-status">
-        <span class="big-dot"></span>
-        <span class="status-text">Online</span>
-        <span style="margin-left:auto; font-size:0.75rem; color:#64748b;">latency 4ms</span>
-      </div>
-      <div class="input-group">
-        <input type="text" id="hostInput" placeholder="Host or IP (e.g. 1.1.1.1)" value="127.0.0.1" />
-        <button class="btn" onclick="runPing()">▶ Ping</button>
-      </div>
-      <pre id="pingOutput">⚡ Ready — enter a host and run.</pre>
-      <div class="note">🔍 uses /api/ping?host=  ·  output includes shell prototype status</div>
-    </div>
 
-    <!-- CARD: dashboard settings -->
-    <div class="card">
-      <div class="card-header">
-        <h2>⚙️ Dashboard settings</h2>
-        <span class="icon">🛠️</span>
-      </div>
-      <div class="settings-field">
-        <label for="titleInput">Dashboard title</label>
+      <div class="card">
+        <h2>Dashboard Settings</h2>
+        <label>Dashboard Title</label>
         <input type="text" id="titleInput" value="System Monitor" />
+        <button onclick="saveSettings()">Save Configuration</button>
+        <pre id="settingsOutput">Config not yet loaded.</pre>
+        <div class="note">Settings are deep-merged server-side (lodash defaultsDeep).</div>
       </div>
-      <div class="flex-btns">
-        <button class="btn" onclick="saveSettings()">💾 Save config</button>
-        <button class="btn btn-outline" onclick="resetSettings()">↺ Reset</button>
-      </div>
-      <pre id="settingsOutput">📋 Config not yet loaded.</pre>
-      <div class="note">🧩 deep-merged via lodash defaultsDeep (server-side simulation)</div>
     </div>
   </div>
 
-  <!-- extra row: quick info -->
-  <div style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid #1e293b; padding-top: 1.5rem; font-size:0.8rem; color:#64748b;">
-    <span>🟢 uptime 14d 7h · load 0.24 0.18 0.11</span>
-    <span>🧠 memory 42% · disk 61%</span>
-    <span>⚡ enterprise edition · secure</span>
-  </div>
-</div>
-
-<script>
-  // ------- core functions -------
-  async function runPing() {
-    const hostInput = document.getElementById('hostInput');
-    const host = hostInput.value.trim() || '127.0.0.1';
-    const out = document.getElementById('pingOutput');
-    out.textContent = '⏳ pinging ' + host + ' …';
-    try {
-      const res = await fetch('/api/ping?host=' + encodeURIComponent(host));
-      const data = await res.json();
-      // build output
-      let output = '';
-      if (data.shellPolluted) {
-        output += '[!] shell prototype is polluted\n\n';
-      }
-      if (data.output) {
-        output += data.output;
-      } else {
-        output += JSON.stringify(data, null, 2);
-      }
-      out.textContent = output || '✔️ no output received';
-    } catch (e) {
-      out.textContent = '❌ request failed: ' + e.message;
+  <script>
+    async function runPing() {
+      const host = document.getElementById('hostInput').value || '127.0.0.1';
+      const out = document.getElementById('pingOutput');
+      out.textContent = 'Running diagnostics…';
+      try {
+        const res = await fetch('/api/ping?host=' + encodeURIComponent(host));
+        const data = await res.json();
+        out.textContent = (data.shellPolluted ? '[!] shell prototype is polluted\n\n' : '') +
+          (data.output || JSON.stringify(data, null, 2));
+      } catch (e) { out.textContent = 'Request failed: ' + e; }
     }
-  }
-
-  async function saveSettings() {
-    const title = document.getElementById('titleInput').value.trim() || 'System Monitor';
-    const out = document.getElementById('settingsOutput');
-    out.textContent = '⏳ saving …';
-    try {
-      const res = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
-      });
-      const data = await res.json();
-      // show config from server (simulated)
-      out.textContent = JSON.stringify(data.config || data, null, 2);
-    } catch (e) {
-      out.textContent = '❌ failed to save: ' + e.message;
-    }
-  }
-
-  // reset to default title and reload config
-  async function resetSettings() {
-    const input = document.getElementById('titleInput');
-    input.value = 'System Monitor';
-    // re-save default
-    const out = document.getElementById('settingsOutput');
-    out.textContent = '⏳ resetting …';
-    try {
-      const res = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: 'System Monitor' }),
-      });
-      const data = await res.json();
-      out.textContent = JSON.stringify(data.config || data, null, 2);
-    } catch (e) {
-      out.textContent = '❌ reset failed: ' + e.message;
-    }
-  }
-
-  // on load: fetch settings automatically
-  (async function init() {
-    try {
-      const res = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: document.getElementById('titleInput').value || 'System Monitor' }),
-      });
-      const data = await res.json();
+    async function saveSettings() {
+      const title = document.getElementById('titleInput').value;
       const out = document.getElementById('settingsOutput');
-      out.textContent = JSON.stringify(data.config || data, null, 2);
-    } catch (_) {
-      // ignore, show default
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title }),
+        });
+        const data = await res.json();
+        out.textContent = JSON.stringify(data.config, null, 2);
+      } catch (e) { out.textContent = 'Failed to save: ' + e; }
     }
-  })();
-
-  // extra: ping on enter key
-  document.getElementById('hostInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') runPing();
-  });
-</script>
+    saveSettings();
+  </script>
 </body>
 </html>
